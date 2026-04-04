@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"math/rand"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -15,11 +19,40 @@ type SensorData struct {
 }
 
 func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup) {
-	var data SensorData = SensorData{
-		id,
-		(rand.Float64() * 25) + 25,
-		rand.Intn(25) + 50,
-		time.Now()}
+	defer wg.Done()
+	for {
+
+		select {
+		case <-ctx.Done():
+			fmt.Printf("Sensor %d shutting down", id)
+			return
+
+		default:
+			var data SensorData = SensorData{
+				id,
+				(rand.Float64() * 25) + 25,
+				rand.Intn(25) + 50,
+				time.Now()}
+
+			marshalledByte, err := json.Marshal(data)
+			if err != nil {
+				fmt.Println("Marshal Error")
+				continue
+			}
+
+			body := bytes.NewBuffer(marshalledByte)
+			resp, err := http.Post("address", "application/json", body)
+			if err != nil {
+				fmt.Println("HTTP Post Error")
+				continue
+			}
+
+			resp.Body.Close()
+			time.Sleep(1 * time.Second)
+		}
+
+	}
+
 }
 
 func main() {
@@ -29,7 +62,7 @@ func main() {
 
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
-		go sendTelemetry(ctx, rand.Intn(100), &wg)
+		go sendTelemetry(ctx, i, &wg)
 	}
 
 	wg.Wait()
