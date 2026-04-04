@@ -1,0 +1,17 @@
+# Environment Variables
+.env
+
+# Go binaries / Compiled Executables
+iiot-telemetry-engine
+*.exe 
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# VSCode Settings
+.vscode/
+
+# OS Specific Files
+.DS_Store
+
