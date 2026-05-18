@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
 type SensorData struct {
@@ -18,7 +20,7 @@ type SensorData struct {
 	Time_stamp  time.Time `json:"time_stamp"`
 }
 
-func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup) {
+func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.Client) {
 	defer wg.Done()
 	for {
 
@@ -56,13 +58,24 @@ func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup) {
 }
 
 func main() {
+	opts := MQTT.NewClientOptions()
+	opts.AddBroker("tcp://localhost:1883")
+	opts.SetClientID("telemetry-engine")
+
+	client := MQTT.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	}
+
+	fmt.Println("Mosquitto Broker connected Successfully!")
+
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
-		go sendTelemetry(ctx, i, &wg)
+		go sendTelemetry(ctx, i, &wg, client)
 	}
 
 	wg.Wait()
