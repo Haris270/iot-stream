@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"net/http"
+
 	"sync"
 	"time"
 
@@ -36,20 +35,16 @@ func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.
 				rand.Intn(25) + 50,
 				time.Now()}
 
+			topic := fmt.Sprintf("factory/building/device/%d", id)
+
 			marshalledByte, err := json.Marshal(data)
 			if err != nil {
 				fmt.Println("Marshal Error")
 				continue
 			}
 
-			body := bytes.NewBuffer(marshalledByte)
-			resp, err := http.Post("address", "application/json", body)
-			if err != nil {
-				fmt.Println("HTTP Post Error")
-				continue
-			}
+			client.Publish(topic, 0, false, marshalledByte)
 
-			resp.Body.Close()
 			time.Sleep(1 * time.Second)
 		}
 
