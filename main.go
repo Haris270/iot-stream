@@ -25,7 +25,7 @@ func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.
 
 		select {
 		case <-ctx.Done():
-			fmt.Printf("Sensor %d shutting down", id)
+			fmt.Printf("Sensor %d shutting down\n", id)
 			return
 
 		default:
