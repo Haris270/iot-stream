@@ -36,7 +36,7 @@ func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.
 				rand.Intn(25) + 50,
 				time.Now()}
 
-			topic := fmt.Sprintf("factory/building/device/%d", id)
+			topic := fmt.Sprintf("telemetry/sensor/%d", id)
 
 			marshalledByte, err := json.Marshal(data)
 			if err != nil {
