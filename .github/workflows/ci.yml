@@ -36,6 +36,14 @@ jobs:
       - name: Build Go Project
         run: go build -v ./...
 
+      #Step 5: Run Automated Tests
+      - name: Run Unit Test
+        run: go test -v ./...
+      
+      #Step 6: Basic Code Quality Check (go-lint)
+      - name: Run Go Vet
+        run: go vet ./...
+
 
         
 

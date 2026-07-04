@@ -20,6 +20,16 @@ type SensorData struct {
 	Time_stamp  time.Time `json:"time_stamp"`
 }
 
+func generateSensorPayload(id int) ([]byte, error) {
+	var data SensorData = SensorData{
+		id,
+		(rand.Float64() * 25) + 25,
+		rand.Intn(25) + 50,
+		time.Now()}
+
+	return json.Marshal(data)
+}
+
 func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.Client) {
 	defer wg.Done()
 	for {
@@ -30,19 +40,13 @@ func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.
 			return
 
 		default:
-			var data SensorData = SensorData{
-				id,
-				(rand.Float64() * 25) + 25,
-				rand.Intn(25) + 50,
-				time.Now()}
-
-			topic := fmt.Sprintf("telemetry/sensor/%d", id)
-
-			marshalledByte, err := json.Marshal(data)
+			marshalledByte, err := generateSensorPayload(id)
 			if err != nil {
 				fmt.Println("Marshal Error")
 				continue
 			}
+
+			topic := fmt.Sprintf("telemetry/sensor/%d", id)
 
 			client.Publish(topic, 0, false, marshalledByte)
 
