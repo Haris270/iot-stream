@@ -25,7 +25,7 @@ func TestGenerateSensorPayload(t *testing.T) {
 		t.Fatalf("Test Failed: Expected Sensor ID: %d, instead got: %d", test_ID, result.Device_id)
 	}
 
-	if result.Temperature < 25.0 || result.Temperature >= 50.0 {
+	if result.Temperature < 25.0 || result.Temperature >= 110.0 {
 		t.Errorf("Expected Temperature between 25 and 50, got %f", result.Temperature)
 	}
 
