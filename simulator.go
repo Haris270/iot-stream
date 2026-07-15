@@ -21,9 +21,11 @@ type SensorData struct {
 }
 
 func generateSensorPayload(id int) ([]byte, error) {
+	baseTemp := 25.0 + float64(id%70)
+	temp := baseTemp + (rand.Float64() * 15.0)
 	var data SensorData = SensorData{
 		id,
-		(rand.Float64() * 25) + 25,
+		temp,
 		rand.Intn(25) + 50,
 		time.Now()}
 
@@ -50,7 +52,7 @@ func sendTelemetry(ctx context.Context, id int, wg *sync.WaitGroup, client MQTT.
 
 			client.Publish(topic, 0, false, marshalledByte)
 
-			time.Sleep(1 * time.Second)
+			// time.Sleep(1 * time.Second)
 		}
 
 	}
