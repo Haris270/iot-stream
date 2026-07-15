@@ -27,6 +27,21 @@ func InitSchema(dbPool *pgxpool.Pool) {
 	}
 
 	fmt.Println("Database successfully created!")
+
+	hypertable_query := `
+	SELECT create_hypertable(
+		'sensor_data',
+		'time',
+		if_not_exists => true
+	)`
+
+	_, err = dbPool.Exec(startupCtx, hypertable_query)
+	if err != nil {
+		panic(fmt.Sprintf("Error: Failed to convert table to HyperTable: %v", err))
+	}
+
+	fmt.Println("Hypertable succesfully initialized")
+
 }
 
 func InsertTelemetry(dbPool *pgxpool.Pool, data SensorData) {
