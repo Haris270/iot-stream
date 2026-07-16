@@ -14,3 +14,37 @@ This is a containerized telemetry pipeline that simulates and visualizes industr
 <p align="center">
 <img width="392" height="695" alt="image" src="https://github.com/user-attachments/assets/0168ded7-0bc6-43c0-89ab-5a38cecf371a" />
 </p>
+
+---
+
+## Getting Started
+
+### Prerequisites
+* [Docker](https://docs.docker.com/get-started/get-docker/) and Docker Compose installed on your machine.
+* Git
+
+## Installation & Setup
+
+**1. Clone the Repository**
+```bash
+git clone https://github.com/Haris270/iot-stream.git
+cd iot-stream
+```
+**2. Configure the Environment**<br>
+Create a .env file and add these environment variables:
+```
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=secret_password
+POSTGRES_DB=telemetry_db
+
+GF_SECURITY_ADMIN_USER=admin
+GF_SECURITY_ADMIN_PASSWORD=admin
+```
+**3. Deploy the Pipeline**
+```
+docker compose up -d
+```
+**4. Clean Up (Teardown)**
+```
+docker compose down -v
+```
