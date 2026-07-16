@@ -1,0 +1,14 @@
+apiVersion: 1
+
+datasources:
+  - name: afs3lee3i4kqoa  # Must exactly match the datasource name used in your dashboard JSON
+    type: postgres
+    access: proxy
+    url: timescaledb:5432 # The name of your DB container service in docker-compose
+    user: ${POSTGRES_USER}
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD}
+    jsonData:
+      database: ${POSTGRES_DB}
+      sslmode: 'disable' # Assuming local docker testing
+      postgresVersion: 15 # Or your specific Timescale/Postgres version
