@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'Telemetry Engine Dashboards' # Name of the provider
+    orgId: 1
+    folder: 'Operations'               # Put it in a clean Grafana folder
+    type: file
+    disableDeletion: false
+    editable: true                     # Crucial! Let recruiters edit/explore your panels
+    options:
+      path: /var/lib/grafana/dashboards # Where Grafana will read the JSONs inside the container
