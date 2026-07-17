@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -24,29 +23,12 @@ func main() {
 		panic(fmt.Sprintf("Failed to create Database Connection: %v", err))
 	}
 
-	// --- ADD THIS RESILIENT PING LOOP ---
-	var pingErr error
-	maxRetries := 10
-
-	for i := 1; i <= maxRetries; i++ {
-		// Create a short 2-second context for each individual ping attempt
-		pingCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		pingErr = pool.Ping(pingCtx)
-		cancel()
-
-		if pingErr == nil {
-			fmt.Println("Database connection verified and ready!")
-			break
-		}
-
-		log.Printf("Database not ready yet (Attempt %d/%d). Retrying in 2 seconds...", i, maxRetries)
-		time.Sleep(2 * time.Second)
+	// Ping the database and form connection
+	if err := pingPool(pool); err != nil {
+		panic(fmt.Sprintf("Database failed to become ready: %v", err))
 	}
 
-	// If we exhausted all retries and still can't connect, THEN we panic
-	if pingErr != nil {
-		panic(fmt.Sprintf("Database failed to become ready: %v", pingErr))
-	}
+	fmt.Println("Database connection successful!")
 
 	defer pool.Close()
 	InitSchema(pool)
