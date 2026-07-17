@@ -9,6 +9,27 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+func pingPool(dbPool *pgxpool.Pool) error {
+	var pingErr error
+	var maxTries int = 10
+
+	for i := 1; i <= maxTries; i++ {
+		pingCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		pingErr = dbPool.Ping(pingCtx)
+		cancel()
+
+		if pingErr == nil {
+			return nil
+		}
+
+		log.Printf("Database not ready - Attempt (%d/%d) - Retrying in 2 seconds...\n", i, maxTries)
+		time.Sleep(2 * time.Second)
+	}
+
+	return fmt.Errorf("exhausted %d retries: %w", maxTries, pingErr)
+
+}
+
 func InitSchema(dbPool *pgxpool.Pool) {
 	query := `
 	CREATE TABLE IF NOT EXISTS sensor_data(
